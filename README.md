@@ -207,6 +207,7 @@ Implement an OpenSearch query that supports the following semantics for a user s
   .
   ├── scripts/
   │   ├── setup.sh               # One-click index + data setup
+  │   ├── node_setup.sh          # Node.js environment setup
   │   ├── index_mapping.json     # OpenSearch index definition
   │   └── sample_data.json       # Sample data (3 works)
   ├── src/
@@ -235,3 +236,13 @@ npx ts-node src/index.ts "jungle hoodie"
 ```bash
 npm test
 ```
+
+## 🧠 Questions
+### Token matching logic and how synonyms are applied
+The search query is designed to tokenize the user input (e.g., "jungle hoodie") and ensure that each token must match at least one of the following fields: the work title, tags, or an enabled product’s name. Token matching is handled by OpenSearch’s built-in analyzers, which apply standard tokenization and normalization (e.g., lowercasing). For products.name, a custom analyzer with a synonym filter is used to normalize common product name variations — for example, “hoodie” and “pullover hoodie” or “tshirt” and “classic t-shirt” are treated as equivalent during both indexing and querying.
+
+### Handling nested products and enabling filtering
+To ensure accurate matching within individual products, the products field is mapped as a nested object. This structure guarantees that matches on name and enabled: true occur within the same product instance. The query uses a nested clause with a bool condition that includes a term filter on products.enabled and a match on products.name. This ensures only enabled products contribute to the match, and prevents false positives caused by cross-object matches in arrays.
+
+### How relevance scoring might work and possible improvements
+Relevance scoring leverages OpenSearch’s default BM25 ranking algorithm. Since tokens can match across multiple fields, the should clauses are used within each token-level match to boost results with broader matches. However, we enforce minimum_should_match: 1 to avoid incomplete token matches. Future improvements could include boosting matches in products.name over title or tags, tuning synonym weightings, or applying function_score to incorporate product popularity or recency into relevance.
