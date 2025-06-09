@@ -185,4 +185,53 @@ Implement an OpenSearch query that supports the following semantics for a user s
   }
 }
 ```
-## Deliverables
+## 📦 Deliverables
+
+### Index Mapping
+[index_mapping.json](https://github.com/isimpsondu/opensearch-assessment/blob/main/scripts/index_mapping.json)
+
+### Sample Data JSON
+[sample_data.json](https://github.com/isimpsondu/opensearch-assessment/blob/main/scripts/sample_data.json)
+
+### OpenSearch Query DSL
+[query.ts](https://github.com/isimpsondu/opensearch-assessment/blob/main/src/query.ts)
+
+## ⚙️ Prerequisites
+
+- Node.js (v23.7.0 or higher)
+- Docker Desktop (for macOS/Windows) or Docker Engine with Docker Compose (for Linux)
+
+## 📁 Project Structure
+
+  ```folder
+  .
+  ├── scripts/
+  │   ├── setup.sh               # One-click index + data setup
+  │   ├── index_mapping.json     # OpenSearch index definition
+  │   └── sample_data.json       # Sample data (3 works)
+  ├── src/
+  │   ├── client.ts              # OpenSearch client
+  │   ├── index.ts               # CLI-based search runner
+  │   ├── query.ts               # DSL Query builder logic
+  │   ├── query.test.ts          # Unit tests
+  ```
+
+## ⏳ Run The Setup
+```bash
+npm run setup
+```
+This will:
+  - Set up Node.js environment
+  - Install all dependencies
+  - Start OpenSearch docker container
+  - Run database migrations
+
+## 🚀 Run The App
+```bash
+npx ts-node src/index.ts "jungle hoodie"
+```
+
+## 🧪 Run The Tests
+```bash
+npm test
+```
