@@ -1,0 +1,31 @@
+[
+  {
+    "work_id": 274839,
+    "title": "Retro Sticker Collection",
+    "tags": ["stickers", "vintage", "fun"],
+    "products": [
+      { "product_id": "sticker", "name": "sticker", "stage": "Active", "enabled": true },
+      { "product_id": "coaster", "name": "coasters", "stage": "Active", "enabled": true }
+    ]
+  },
+  {
+    "work_id": 593210,
+    "title": "Clockwork Jungle",
+    "tags": ["clock", "jungle", "time"],
+    "products": [
+      { "product_id": "clock", "name": "clock", "stage": "Active", "enabled": true },
+      { "product_id": "tshirt", "name": "classic t-shirt", "stage": "Active", "enabled": true },
+      { "product_id": "hoodie", "name": "Pullover Hoodie", "stage": "Active", "enabled": true }
+    ]
+  },
+  {
+    "work_id": 862147,
+    "title": "Monochrome Tee Drop",
+    "tags": ["fashion", "shirt", "minimal"],
+    "products": [
+      { "product_id": "tshirt", "name": "classic t-shirt", "stage": "Active", "enabled": true },
+      { "product_id": "sticker", "name": "sticker", "stage": "Active", "enabled": true },
+      { "product_id": "hoodie", "name": "Pullover Hoodie", "stage": "Active", "enabled": true }
+    ]
+  }
+]

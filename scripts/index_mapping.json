@@ -1,0 +1,59 @@
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "product_synonyms": {
+          "type": "synonym",
+          "synonyms": [
+            "tshirt, t-shirt, tee, classic t-shirt",
+            "hoodie, pullover hoodie",
+            "sticker, stickers",
+            "coaster, coasters"
+          ]
+        }
+      },
+      "analyzer": {
+        "product_name_analyzer": {
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "product_synonyms"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "work_id": {
+        "type": "long"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "tags": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "products": {
+        "type": "nested",
+        "properties": {
+          "product_id": {
+            "type": "keyword"
+          },
+          "name": {
+            "type": "text",
+            "analyzer": "product_name_analyzer"
+          },
+          "stage": {
+            "type": "keyword"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
