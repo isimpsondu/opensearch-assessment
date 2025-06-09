@@ -212,9 +212,13 @@ Implement an OpenSearch query that supports the following semantics for a user s
   │   └── sample_data.json       # Sample data (3 works)
   ├── src/
   │   ├── client.ts              # OpenSearch client
-  │   ├── index.ts               # CLI-based search runner
+  │   ├── index.ts               # CLI-based main runner
   │   ├── query.ts               # DSL Query builder logic
   │   ├── query.test.ts          # Unit tests
+  │   ├── retry.ts               # Retry utility
+  │   ├── retry.test.ts          # Unit tests
+  │   ├── search.ts              # Search function
+  │   ├── search.test.ts         # Unit tests
   ```
 
 ## ⏳ Run The Setup
