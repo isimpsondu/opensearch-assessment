@@ -200,6 +200,7 @@ Implement an OpenSearch query that supports the following semantics for a user s
 
 - Node.js (v23.7.0 or higher)
 - Docker Desktop (for macOS/Windows) or Docker Engine with Docker Compose (for Linux)
+- jq: brew install jq (for macOS) or apt install jq (for Linux)
 
 ## 📁 Project Structure
 
