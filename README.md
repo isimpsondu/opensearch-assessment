@@ -242,7 +242,7 @@ npx ts-node src/index.ts "jungle hoodie"
 npm test
 ```
 
-## 🧠 Questions
+## 📌 Explainations
 ### Token matching logic and how synonyms are applied
 The search query is designed to tokenize the user input (e.g., "jungle hoodie") and ensure that each token must match at least one of the following fields: the work title, tags, or an enabled product’s name. Token matching is handled by OpenSearch’s built-in analyzers, which apply standard tokenization and normalization (e.g., lowercasing). For products.name, a custom analyzer with a synonym filter is used to normalize common product name variations — for example, “hoodie” and “pullover hoodie” or “tshirt” and “classic t-shirt” are treated as equivalent during both indexing and querying.
 
@@ -251,3 +251,56 @@ To ensure accurate matching within individual products, the products field is ma
 
 ### How relevance scoring might work and possible improvements
 Relevance scoring leverages OpenSearch’s default BM25 ranking algorithm. Since tokens can match across multiple fields, the should clauses are used within each token-level match to boost results with broader matches. However, we enforce minimum_should_match: 1 to avoid incomplete token matches. Future improvements could include boosting matches in products.name over title or tags, tuning synonym weightings, or applying function_score to incorporate product popularity or recency into relevance.
+
+## 🧠 Follow Up Questions
+### 1. What would you improve on the next iteration of this index?
+At Reebelo, I faced similar challenges with fast-growing product catalogs, there are some good take aways:
+- Add a .raw keyword subfield to products.name for exact matching or aggregations.
+- Move the synonym list to an external file so it’s easier to maintain without reindexing.
+- Fine-tune relevance — e.g. boost product name matches over title/tags using function_score.
+- Depending on growth, consider ILM or shard strategy updates for scale.
+
+### 2. What tools/utilities did you use as part of your process?
+- I used a Dockerized OpenSearch instance for local development — easy to spin up, restart, and test mapping changes in isolation.
+- Used curl + jq to interact directly with OpenSearch APIs for index creation, reindexing, and debugging query behavior.
+- Wrote a custom setup script (setup.sh) to automate index setup and data ingestion — so I could iterate quickly without repeating manual steps.
+- For development and testing, I used TypeScript with ts-node, and Jest to validate that my query logic matched the expected token semantics.
+- For query analysis, I inspected token breakdowns using the _analyze API to ensure the analyzers and synonym filters were working as expected.
+
+### 3. What scale of system would this support and what would you monitor to know when it needed to be reworked?
+- The current design should comfortably support hundreds of thousands of works, especially with moderate product nesting. I’d start reassessing the mapping or cluster strategy if we hit millions of documents or saw significant growth in products[] size.
+- Nested fields don't scale linearly, so I'd watch for query latency spikes, especially under load or with complex token matching.
+- At Reebelo, we are using Kibana and DataDog extensively to monitor API and search performance. In practice, based on my experience I’d monitor:
+  - Shard size and segment count in Kibana
+  - Search latency and query load via DataDog API dashboards
+  - Heap usage, GC pressure, and refresh overhead on data nodes
+
+### 4. How would you scale the OS cluster if we had 1 million times documents?
+- If we’re scaling 1M× the current dataset, we’re talking hundreds of billions of documents, so I’d treat this as a distributed data architecture problem, not just a schema tweak.
+- First, I’d revisit the index design — nested fields become a bottleneck at this scale. I’d likely split works and products into separate indices and use parent-child or denormalized joins where appropriate.
+- On the infra side:
+  - Seperate read/write traffic by creating read replicas to decouple read scalability from write pressure
+  - Scale horizontally by adding more data nodes with balanced shard distribution
+  - Increase the number of primary shards, potentially use index aliases and rollover policies
+- On the operation side:
+  - Index templates to auto-manage new indices
+  - DataDog to monitor search and indexing pressure
+  - Kibana to analyze hot shards or uneven node usage
+
+### 5. How would you scale the OS cluster if each document was 10 x size?
+I've already mentioned some actions in the last question such as revisiting the index design, apart from that:
+- On the infra side:
+  - Add more data nodes with larger heap sizes
+  - Monitor segment merging, GC activity, and disk I/O
+
+### 6. How would you scale to accommodate a spike requests?
+At Reebelo, I've dealt with sudden load spikes during marketing events, product launches and Black Friday etc. Below are the items I was always doing:
+- Enable and tune query caching especially for frequently repeated search patterns
+- If query patterns are predictable, pre-warming or using a coordinating node layer can reduce initial latency
+- On the infra side:
+  - Increase replica shards so the cluster can parallelize queries across nodes
+  - Add more data nodes to distribute the load more evenly
+- On the operation side:
+  - Monitor search thread pool saturation, queue size, and heap pressure via DataDog
+  - Use Kibana to identify hot shards or expensive queries in real time
+  - Set up circuit breakers and slow log thresholds to catch overloads early
